@@ -34,6 +34,7 @@ RUN groupadd -g 1000 www && useradd -u 1000 -ms /bin/bash -g www www
 COPY --chown=www:www-data . /var/www
 
 RUN chmod -R ug+w /var/www/storage
+# RUN chmod -R 777 /var/www/storage
 
 RUN cp docker/supervisor.conf /etc/supervisord.conf
 RUN cp docker/php.ini /usr/local/etc/php/conf.d/app.ini
@@ -41,6 +42,7 @@ RUN cp docker/nginx.conf /etc/nginx/sites-enabled/default
 
 RUN mkdir -p /var/log/php && touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
 
+USER www
 
 RUN cp docker/.env.production .env
 
@@ -48,8 +50,8 @@ RUN composer install --ignore-platform-reqs --optimize-autoloader --no-dev
 
 RUN chmod +x /var/www/docker/run.sh
 
-
 EXPOSE 80
 
-ENTRYPOINT ["/var/www/docker/run.sh"]
+CMD ["php-fpm"]
+# ENTRYPOINT ["/var/www/docker/run.sh"]
 # CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
